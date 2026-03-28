@@ -1,1 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Specs</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
 
+<body class="text-white bg-[#020617]">
+
+<header class="flex justify-between items-center px-10 py-6 backdrop-blur-md bg-white/5 border-b border-white/10">
+<h1 class="text-xl font-semibold">Shiven Lab</h1>
+<nav class="space-x-6 text-sm">
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="updates.html">Updates</a>
+</nav>
+</header>
+
+<section class="max-w-6xl mx-auto mt-20 px-6">
+
+<h1 class="text-4xl font-bold mb-10">Homelab Architecture</h1>
+
+<div class="grid md:grid-cols-3 gap-8">
+
+<div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+<h2 class="text-lg font-semibold mb-4">Core Stack</h2>
+<ul class="text-gray-400 text-sm space-y-2">
+<li>Splunk (SIEM)</li>
+<li>Wazuh (EDR)</li>
+<li>pfSense (Firewall)</li>
+<li>VMware</li>
+</ul>
+</div>
+
+<div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+<h2 class="text-lg font-semibold mb-4">Virtual Machines</h2>
+<ul class="text-gray-400 text-sm space-y-2">
+<li>Kali Linux (Attacker)</li>
+<li>Ubuntu Server (Victim)</li>
+<li>Wazuh Server</li>
+<li>Splunk Server</li>
+</ul>
+</div>
+
+<div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+<h2 class="text-lg font-semibold mb-4">Goals</h2>
+<p class="text-gray-400 text-sm">
+Simulate real SOC operations by generating attacks, analyzing logs, and building detection dashboards.
+</p>
+</div>
+
+</div>
+
+</section>
+
+</body>
+</html>
