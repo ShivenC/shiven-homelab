@@ -2,51 +2,76 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Specs</title>
+<title>Lab Specs</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="text-white bg-[#020617]">
 
-<header class="flex justify-between items-center px-10 py-6 backdrop-blur-md bg-white/5 border-b border-white/10">
+<header class="flex justify-between items-center px-10 py-6 backdrop-blur-md bg-white/5 border-b border-white/10 sticky top-0">
 <h1 class="text-xl font-semibold">Shiven Lab</h1>
 <nav class="space-x-6 text-sm">
-<a href="index.html">Home</a>
-<a href="about.html">About</a>
-<a href="updates.html">Updates</a>
+<a href="index.html" class="hover:text-blue-400">Home</a>
+<a href="about.html" class="hover:text-blue-400">About</a>
+<a href="updates.html" class="hover:text-blue-400">Updates</a>
 </nav>
 </header>
 
 <section class="max-w-6xl mx-auto mt-20 px-6">
 
-<h1 class="text-4xl font-bold mb-10">Homelab Architecture</h1>
+<h1 class="text-4xl font-bold mb-10">Homelab Architecture & Components</h1>
 
 <div class="grid md:grid-cols-3 gap-8">
 
+<!-- Core Tools -->
 <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-<h2 class="text-lg font-semibold mb-4">Core Stack</h2>
-<ul class="text-gray-400 text-sm space-y-2">
-<li>Splunk (SIEM)</li>
-<li>Wazuh (EDR)</li>
-<li>pfSense (Firewall)</li>
-<li>VMware</li>
+<h2 class="text-lg font-semibold mb-4">Core Tools</h2>
+<ul class="text-gray-400 text-sm space-y-4">
+<li>
+<strong>Splunk – SIEM:</strong> Collects and analyzes logs from all lab machines. I use it to detect suspicious activity, visualize security events, and simulate real SOC dashboards.
+</li>
+<li>
+<strong>Wazuh – EDR:</strong> Monitors endpoints for malware, policy violations, and abnormal behavior. It complements Splunk by providing real-time alerts and threat intelligence.
+</li>
+<li>
+<strong>pfSense – Firewall:</strong> Provides network segmentation, NAT, and packet filtering. I use it to create a realistic network environment with DMZs and restricted segments.
+</li>
+<li>
+<strong>VMware Workstation:</strong> Hosts all virtual machines, allowing me to simulate attackers, victims, and monitoring servers in a controlled environment.
+</li>
 </ul>
 </div>
 
+<!-- Virtual Machines -->
 <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
 <h2 class="text-lg font-semibold mb-4">Virtual Machines</h2>
-<ul class="text-gray-400 text-sm space-y-2">
-<li>Kali Linux (Attacker)</li>
-<li>Ubuntu Server (Victim)</li>
-<li>Wazuh Server</li>
-<li>Splunk Server</li>
+<ul class="text-gray-400 text-sm space-y-4">
+<li>
+<strong>Kali Linux – Attacker:</strong> Used to perform penetration tests, simulate attacks like brute-force and phishing, and test detection rules in Splunk and Wazuh.
+</li>
+<li>
+<strong>Ubuntu Server – Victim:</strong> Receives simulated attacks, generates logs, and acts as a target for monitoring, giving a realistic environment for log analysis.
+</li>
+<li>
+<strong>Wazuh Server:</strong> Central endpoint monitoring server that collects alerts from VMs, performs correlation, and provides insight into potential threats.
+</li>
+<li>
+<strong>Splunk Server:</strong> Central SIEM server that ingests logs from all VMs, visualizes them in dashboards, and allows me to create custom detection rules for attacks.
+</li>
 </ul>
 </div>
 
+<!-- Goals & Workflow -->
 <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-<h2 class="text-lg font-semibold mb-4">Goals</h2>
+<h2 class="text-lg font-semibold mb-4">Goals & Workflow</h2>
+<p class="text-gray-400 text-sm mb-4">
+This lab simulates a real SOC environment. My goal is to generate attacks, detect them using Splunk and Wazuh, analyze logs, and understand the entire attack-to-response lifecycle.
+</p>
+<p class="text-gray-400 text-sm mb-4">
+Each component works together: pfSense isolates networks, VMs simulate attacks and targets, Wazuh monitors endpoints, and Splunk visualizes events and alerts for actionable insights.
+</p>
 <p class="text-gray-400 text-sm">
-Simulate real SOC operations by generating attacks, analyzing logs, and building detection dashboards.
+By iteratively updating the lab weekly, I can test new attack vectors, refine detection rules, and document progress, demonstrating hands-on expertise to recruiters.
 </p>
 </div>
 
