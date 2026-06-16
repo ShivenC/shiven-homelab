@@ -131,25 +131,9 @@
     </div>
   </div>
 
-  <!-- phase 03 migration -->
-  <div class="phase">
-    <span class="node n-done"></span>
-    <div class="ph-head">
-      <span class="ph-id">phase 03</span>
-      <h2 class="ph-title">Hypervisor migration — VirtualBox → VMware</h2>
-      <span class="tag t-done">done</span>
-    </div>
-    <div class="ph-body">
-      <p>The host&rsquo;s Hyper-V components conflicted with VirtualBox and blocked the Windows 11 endpoint from booting. Rather than fight it, I moved the entire lab to <b>VMware Workstation</b> &mdash; without rebuilding anything.</p>
-      <div class="callout">
-        <div class="ct">// the fix that worked</div>
-        <p>OVF export choked on a disk-capacity mismatch, and a direct attach tried to mount the disk as raw physical storage. The clean path was converting each disk explicitly: <code>VBoxManage clonemedium</code> for the DC and <code>vmware-vdiskmanager -r</code> for pfSense, then attaching the converted VMDKs to fresh VM shells.</p>
-      </div>
-      <p>Result: pfSense came back with all four interfaces intact, and DC01 booted with the full domain preserved &mdash; <code>Get-ADDomain</code> confirmed every user, OU, and role survived. Only fix needed was re-setting the static IP after the virtual NIC changed.</p>
-    </div>
-  </div>
+  
 
-  <!-- phase 04 endpoint -->
+  <!-- phase 03 endpoint -->
   <div class="phase">
     <span class="node n-dev"></span>
     <div class="ph-head">
@@ -167,7 +151,7 @@
     </div>
   </div>
 
-  <!-- phase 05 splunk -->
+  <!-- phase 04 splunk -->
   <div class="phase">
     <span class="node n-dev"></span>
     <div class="ph-head">
@@ -180,7 +164,7 @@
     </div>
   </div>
 
-  <!-- phase 06 attacks -->
+  <!-- phase 05 attacks -->
   <div class="phase">
     <span class="node n-plan"></span>
     <div class="ph-head">
