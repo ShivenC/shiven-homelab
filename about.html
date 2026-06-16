@@ -2,66 +2,182 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>About Shiven</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Shiven Chhugani</title>
+<meta name="description" content="Shiven Chhugani — B.S. Cybersecurity at USF, SOC and detection-focused. The story behind the home lab.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e14; --panel:#121821; --panel2:#0c121a; --line:#1e2733; --muted:#7d8a9c; --text:#e6edf3;
+    --signal:#5ce6a1; --alert:#ffb454; --crit:#ff6b6b; --blue:#6fb3ff; --maxw:1120px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    background:radial-gradient(900px 500px at 80% -10%,rgba(92,230,161,.06),transparent 60%),var(--bg)}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:'JetBrains Mono',monospace}
+  header.nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(10px);
+    background:rgba(10,14,20,.72);border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:var(--maxw);margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+  .brand{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--signal);
+    border:1px solid var(--line);background:var(--panel);padding:5px 9px;border-radius:6px}
+  .links{display:flex;gap:28px;font-size:14px}
+  .links a{color:var(--muted);transition:color .15s}
+  .links a:hover,.links a[aria-current]{color:var(--text)}
+  .gh{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .gh:hover{color:var(--text)}
+  @media(max-width:720px){.links{display:none}}
+
+  .head{max-width:var(--maxw);margin:0 auto;padding:64px 24px 8px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--alert);margin-bottom:12px}
+  h1{font-size:clamp(30px,5vw,46px);font-weight:700;letter-spacing:-.02em;margin:0 0 20px}
+  .bio{max-width:680px}
+  .bio p{color:var(--muted);font-size:16px;line-height:1.7;margin:0 0 16px}
+  .bio p b{color:var(--text);font-weight:600}
+
+  .grid{max-width:var(--maxw);margin:48px auto 0;padding:0 24px;
+    display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .panel{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:24px}
+  .panel h2{font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--muted);
+    margin:0 0 18px;text-transform:uppercase;letter-spacing:.05em}
+
+  .exp{list-style:none;margin:0;padding:0}
+  .exp li{padding:0 0 16px;border-bottom:1px solid var(--line);margin-bottom:16px}
+  .exp li:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+  .exp .role{font-size:14.5px;font-weight:600}
+  .exp .org{font-size:13px;color:var(--muted)}
+  .exp .when{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);margin-top:2px}
+
+  .certs{display:flex;flex-direction:column;gap:10px;margin:0 0 20px;padding:0;list-style:none}
+  .certs li{display:flex;align-items:center;gap:10px;font-size:14px}
+  .certs .ck{width:7px;height:7px;border-radius:99px;background:var(--signal)}
+  .certs .prog{background:var(--alert)}
+  .certs .ip{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--alert);margin-left:auto}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);
+    border:1px solid var(--line);background:var(--panel2);padding:5px 10px;border-radius:7px}
+
+  .why{max-width:var(--maxw);margin:20px auto 0;padding:0 24px 0}
+  .why .panel{padding:28px}
+  .why p{margin:0;color:var(--muted);font-size:15px;line-height:1.7}
+  .why p b{color:var(--text)}
+
+  .cta{max-width:var(--maxw);margin:40px auto 0;padding:0 24px 0;text-align:center}
+  .cta a{display:inline-block;margin:0 6px;font-size:14px}
+  .cta .btn{padding:11px 20px;border-radius:9px;border:1px solid var(--line);background:var(--panel);transition:.15s}
+  .cta .btn:hover{border-color:rgba(92,230,161,.35);color:var(--text)}
+
+  footer{border-top:1px solid var(--line);margin-top:88px}
+  .foot{max-width:var(--maxw);margin:0 auto;padding:40px 24px;display:flex;flex-wrap:wrap;
+    align-items:center;justify-content:space-between;gap:16px}
+  .foot .who{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .foot .fl{display:flex;gap:24px;font-size:14px}
+  .foot .fl a{color:var(--muted)}.foot .fl a:hover{color:var(--text)}
+</style>
 </head>
+<body>
 
-<body class="text-white bg-[#020617]">
-
-<header class="flex justify-between items-center px-10 py-6 backdrop-blur-md bg-white/5 border-b border-white/10 sticky top-0">
-<a href="index.html" class="text-xl font-semibold hover:text-blue-400">Shiven Lab</a>
-<nav class="space-x-6 text-sm">
-<a href="index.html" class="hover:text-blue-400">Home</a>
-<a href="specs.html" class="hover:text-blue-400">Specs</a>
-<a href="updates.html" class="hover:text-blue-400">Updates</a>
-</nav>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">~/shivenlab</a>
+    <nav class="links">
+      <a href="index.html">Overview</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="detections.html">Detections</a>
+      <a href="updates.html">Build Log</a>
+      <a href="about.html" aria-current="page">About</a>
+    </nav>
+    <a href="https://github.com/ShivenC/shiven-homelab" class="gh">GitHub ↗</a>
+  </div>
 </header>
 
-<section class="max-w-4xl mx-auto mt-20 px-6">
-
-<h1 class="text-4xl font-bold mb-6">About Me</h1>
-
-<p class="text-gray-400 text-lg leading-relaxed mb-6">
-Hi, I'm <span class="text-white font-semibold">Shiven Chhugani</span>, a Cybersecurity student at the University of South Florida (B.S., expected May 2026).  
-I'm passionate about building real-world security environments to practice monitoring, detection, and incident response in hands-on labs.
-</p>
-
-<p class="text-gray-400 text-lg leading-relaxed mb-6">
-Through my homelab, I simulate SOC operations, analyze logs with SIEM tools like Splunk, experiment with EDR platforms like Wazuh, and configure network defenses with pfSense.  
-This allows me to bridge theory and practice while constantly learning and experimenting with security technologies.
-</p>
-
-<div class="grid md:grid-cols-2 gap-8 mt-8">
-
-<div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-<h2 class="text-xl font-semibold mb-4">Experience & Projects</h2>
-<ul class="text-gray-400 space-y-3 text-sm">
-<li>AV Phone Technician — USF (2025–Present)</li>
-<li>Cybersecurity Candidate — ReliaQuest Labs (Feb–Mar 2026)</li>
-<li>AI Honeypot Analytics Platform</li>
-<li>AI Program Management Automation System</li>
-<li>IT Intern — ACT Jamaica</li>
-</ul>
+<div class="head">
+  <div class="eyebrow">// whoami</div>
+  <h1>Shiven Chhugani</h1>
+  <div class="bio">
+    <p>I&rsquo;m a <b>Cybersecurity</b> student at the University of South Florida (B.S., May 2026), focused on the defensive side &mdash; <b>SOC operations, detection engineering, and incident response</b>.</p>
+    <p>I learn by building. This lab is where I take the things I&rsquo;ve studied and the work I did during my <b>ReliaQuest</b> apprenticeship and turn them into something hands-on: a network I can attack, instrument, and defend, then document honestly &mdash; including the parts that break.</p>
+  </div>
 </div>
 
-<div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-<h2 class="text-xl font-semibold mb-4">Certifications & Skills</h2>
-<p class="text-gray-400 text-sm">CompTIA Security+ (SY0-701)</p>
-<p class="text-gray-400 text-sm mt-4">Skills: Splunk, Wazuh, pfSense, Kali Linux, Wireshark, Nmap, Burp Suite, Docker, AWS, Python, C/C++, JavaScript</p>
+<div class="grid">
+  <div class="panel">
+    <h2>Experience</h2>
+    <ul class="exp">
+      <li>
+        <div class="role">Cybersecurity Apprentice</div>
+        <div class="org">ReliaQuest · Tampa, FL</div>
+        <div class="when">Feb 2026 – Mar 2026</div>
+      </li>
+      <li>
+        <div class="role">IT Technician</div>
+        <div class="org">University of South Florida</div>
+        <div class="when">May 2025 – Present</div>
+      </li>
+      <li>
+        <div class="role">IT Support Technician</div>
+        <div class="org">University of South Florida</div>
+        <div class="when">May 2024 – May 2025</div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="panel">
+    <h2>Certifications</h2>
+    <ul class="certs">
+      <li><span class="ck"></span> CompTIA Security+</li>
+      <li><span class="ck"></span> CompTIA Network+</li>
+      <li><span class="ck"></span> CompTIA CySA+</li>
+      <li><span class="ck prog"></span> AWS Cloud Practitioner <span class="ip">in progress</span></li>
+    </ul>
+    <h2 style="margin-top:8px">Tooling</h2>
+    <div class="chips">
+      <span class="chip">Splunk</span>
+      <span class="chip">Sysmon</span>
+      <span class="chip">pfSense</span>
+      <span class="chip">Suricata</span>
+      <span class="chip">Kali</span>
+      <span class="chip">Nessus</span>
+      <span class="chip">Wireshark</span>
+      <span class="chip">Nmap</span>
+      <span class="chip">Burp Suite</span>
+      <span class="chip">MITRE ATT&amp;CK</span>
+      <span class="chip">NIST 800-53</span>
+      <span class="chip">Python</span>
+      <span class="chip">PowerShell</span>
+      <span class="chip">Bash</span>
+    </div>
+  </div>
 </div>
 
+<div class="why">
+  <div class="panel">
+    <h2>Why I built this</h2>
+    <p>Reading about an attack and detecting one are different skills. I built this lab to live on the defender&rsquo;s side of that gap &mdash; to generate a real Kerberoasting attempt or credential dump, watch it surface in the logs, and write the detection that catches it next time. <b>It&rsquo;s the closest thing to a real SOC I can run on a laptop</b>, and every phase is documented here so the work speaks for itself.</p>
+  </div>
 </div>
 
-<div class="mt-10 bg-white/5 p-6 rounded-2xl border border-white/10">
-<h2 class="text-xl font-semibold mb-4">Why I Built the Homelab</h2>
-<p class="text-gray-400">
-I built this homelab to gain practical, hands-on experience in cybersecurity operations.  
-It helps me understand how attacks happen, how to detect them, and how to respond effectively — exactly what SOC analysts do in real-world environments.  
-This project also allows me to consistently experiment, document progress, and demonstrate my skills to recruiters.
-</p>
+<div class="cta">
+  <a href="https://github.com/ShivenC/shiven-homelab" class="btn">GitHub ↗</a>
+  <a href="https://linkedin.com/in/shiven-chhugani" class="btn">LinkedIn ↗</a>
+  <a href="mailto:shivenchhugani@gmail.com" class="btn">Email ↗</a>
 </div>
 
-</section>
+<footer>
+  <div class="foot">
+    <div class="who">shivenlab.local · built &amp; documented by Shiven Chhugani</div>
+    <div class="fl">
+      <a href="index.html">Overview</a>
+      <a href="https://github.com/ShivenC/shiven-homelab">GitHub ↗</a>
+      <a href="https://linkedin.com/in/shiven-chhugani">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
 
 </body>
 </html>
