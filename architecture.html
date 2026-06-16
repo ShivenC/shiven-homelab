@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture — Shiven Homelab</title>
+<meta name="description" content="Network topology of the lab: three isolated subnets behind pfSense, five VMs, and the log pipeline into Splunk.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e14; --panel:#121821; --line:#1e2733; --muted:#7d8a9c; --text:#e6edf3;
+    --signal:#5ce6a1; --alert:#ffb454; --crit:#ff6b6b; --blue:#6fb3ff; --maxw:1120px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    background:radial-gradient(900px 500px at 80% -10%,rgba(92,230,161,.06),transparent 60%),var(--bg)}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  header.nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(10px);
+    background:rgba(10,14,20,.72);border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:var(--maxw);margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+  .brand{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--signal);
+    border:1px solid var(--line);background:var(--panel);padding:5px 9px;border-radius:6px}
+  .links{display:flex;gap:28px;font-size:14px}
+  .links a{color:var(--muted);transition:color .15s}
+  .links a:hover,.links a[aria-current]{color:var(--text)}
+  .gh{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .gh:hover{color:var(--text)}
+  @media(max-width:720px){.links{display:none}}
+
+  .head{max-width:var(--maxw);margin:0 auto;padding:64px 24px 8px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--alert);margin-bottom:12px}
+  h1{font-size:clamp(30px,5vw,46px);font-weight:700;letter-spacing:-.02em;margin:0 0 16px}
+  .sub{color:var(--muted);max-width:680px;font-size:16px}
+
+  section.block{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .mb{margin-bottom:88px}
+  .mt48{margin-top:48px}
+  h2.sec{font-size:clamp(20px,3vw,26px);font-weight:600;margin:0 0 8px}
+  .sec-note{color:var(--muted);font-size:14px;margin:0 0 28px}
+
+  .diagram{border:1px solid var(--line);background:#0c121a;border-radius:18px;padding:20px;overflow-x:auto}
+  svg{display:block;width:100%;height:auto;min-width:680px}
+
+  .legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:16px;font-size:13px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);
+    border-radius:16px;overflow:hidden;font-size:14px}
+  thead th{background:#0e141d;text-align:left;padding:14px 18px;font-weight:600;
+    font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line)}
+  tbody td{padding:14px 18px;border-bottom:1px solid var(--line);background:var(--panel);vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  td .vm{font-weight:600}
+  td .ip{font-family:'JetBrains Mono',monospace;color:var(--blue);font-size:13px}
+  .st{font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 8px;border-radius:6px;white-space:nowrap}
+  .st-on{background:rgba(92,230,161,.12);color:var(--signal)}
+  .st-dev{background:rgba(255,180,84,.12);color:var(--alert)}
+  @media(max-width:760px){table{font-size:13px}thead th,tbody td{padding:11px 12px}}
+
+  .pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:880px){.pipe{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:480px){.pipe{grid-template-columns:1fr}}
+  .pcard{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:20px}
+  .pcard .h{font-family:'JetBrains Mono',monospace;font-size:12px;margin-bottom:8px}
+  .pcard p{margin:0;font-size:13px;color:var(--muted);line-height:1.6}
+
+  footer{border-top:1px solid var(--line);margin-top:8px}
+  .foot{max-width:var(--maxw);margin:0 auto;padding:40px 24px;display:flex;flex-wrap:wrap;
+    align-items:center;justify-content:space-between;gap:16px}
+  .foot .who{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .foot .fl{display:flex;gap:24px;font-size:14px}
+  .foot .fl a{color:var(--muted)}.foot .fl a:hover{color:var(--text)}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">~/shivenlab</a>
+    <nav class="links">
+      <a href="index.html">Overview</a>
+      <a href="architecture.html" aria-current="page">Architecture</a>
+      <a href="detections.html">Detections</a>
+      <a href="updates.html">Build Log</a>
+      <a href="about.html">About</a>
+    </nav>
+    <a href="https://github.com/ShivenC/shiven-homelab" class="gh">GitHub ↗</a>
+  </div>
+</header>
+
+<div class="head">
+  <div class="eyebrow">// network topology</div>
+  <h1>Three isolated subnets, one firewall, full visibility.</h1>
+  <p class="sub">Every machine sits behind pfSense on its own segment. Attacker traffic is quarantined to its own subnet, and all logs converge on Splunk in the SOC zone. Nothing touches the host network except pfSense&rsquo;s NAT uplink.</p>
+</div>
+
+<section class="block mb mt48">
+  <div class="diagram">
+    <svg viewBox="0 0 920 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Network topology diagram">
+      <defs>
+        <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="#5ce6a1"/>
+        </marker>
+        <marker id="arrm" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="#7d8a9c"/>
+        </marker>
+      </defs>
+
+      <!-- internet + pfSense -->
+      <rect x="380" y="16" width="160" height="42" rx="8" fill="#0e141d" stroke="#1e2733"/>
+      <text x="460" y="38" text-anchor="middle" fill="#7d8a9c" font-family="JetBrains Mono,monospace" font-size="12">internet</text>
+      <text x="460" y="51" text-anchor="middle" fill="#4d5969" font-family="JetBrains Mono,monospace" font-size="10">via host NAT only</text>
+
+      <line x1="460" y1="58" x2="460" y2="86" stroke="#7d8a9c" stroke-width="1.4" stroke-dasharray="4 4"/>
+
+      <rect x="360" y="86" width="200" height="58" rx="10" fill="#141b25" stroke="#ffb454" stroke-width="1.3"/>
+      <text x="460" y="110" text-anchor="middle" fill="#ffb454" font-family="JetBrains Mono,monospace" font-size="13" font-weight="600">pfSense firewall</text>
+      <text x="460" y="128" text-anchor="middle" fill="#7d8a9c" font-family="JetBrains Mono,monospace" font-size="10.5">routing · NAT · Suricata IDS</text>
+
+      <!-- three trunk lines -->
+      <line x1="460" y1="144" x2="460" y2="172" stroke="#1e2733" stroke-width="1.4"/>
+      <line x1="160" y1="172" x2="760" y2="172" stroke="#1e2733" stroke-width="1.4"/>
+      <line x1="160" y1="172" x2="160" y2="200" stroke="#1e2733" stroke-width="1.4"/>
+      <line x1="460" y1="172" x2="460" y2="200" stroke="#1e2733" stroke-width="1.4"/>
+      <line x1="760" y1="172" x2="760" y2="200" stroke="#1e2733" stroke-width="1.4"/>
+
+      <!-- LAN zone -->
+      <rect x="40" y="200" width="240" height="232" rx="14" fill="rgba(111,179,255,.05)" stroke="#26405e"/>
+      <text x="60" y="224" fill="#6fb3ff" font-family="JetBrains Mono,monospace" font-size="12" font-weight="600">LAN · 10.0.1.0/24</text>
+      <text x="60" y="240" fill="#52606f" font-family="JetBrains Mono,monospace" font-size="10">corporate segment</text>
+
+      <rect x="60" y="256" width="200" height="58" rx="9" fill="#121821" stroke="#1e2733"/>
+      <text x="74" y="280" fill="#e6edf3" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="600">DC01 — Domain Controller</text>
+      <text x="74" y="298" fill="#6fb3ff" font-family="JetBrains Mono,monospace" font-size="11">10.0.1.10 · AD/DNS/DHCP</text>
+
+      <rect x="60" y="326" width="200" height="58" rx="9" fill="#121821" stroke="#1e2733"/>
+      <text x="74" y="350" fill="#e6edf3" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="600">WKSTN01 — Endpoint</text>
+      <text x="74" y="368" fill="#ffb454" font-family="JetBrains Mono,monospace" font-size="11">Win11 · victim · (in dev)</text>
+
+      <!-- SOC zone -->
+      <rect x="340" y="200" width="240" height="232" rx="14" fill="rgba(92,230,161,.05)" stroke="#1f4d3a"/>
+      <text x="360" y="224" fill="#5ce6a1" font-family="JetBrains Mono,monospace" font-size="12" font-weight="600">SOC · 10.0.2.0/24</text>
+      <text x="360" y="240" fill="#52606f" font-family="JetBrains Mono,monospace" font-size="10">monitoring segment</text>
+
+      <rect x="360" y="256" width="200" height="58" rx="9" fill="#121821" stroke="#1e2733"/>
+      <text x="374" y="280" fill="#e6edf3" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="600">Splunk — SIEM</text>
+      <text x="374" y="298" fill="#5ce6a1" font-family="JetBrains Mono,monospace" font-size="11">10.0.2.10 · index + alerts</text>
+
+      <rect x="360" y="326" width="200" height="58" rx="9" fill="#121821" stroke="#1e2733"/>
+      <text x="374" y="350" fill="#e6edf3" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="600">Nessus — Scanner</text>
+      <text x="374" y="368" fill="#ffb454" font-family="JetBrains Mono,monospace" font-size="11">cred scans · (planned)</text>
+
+      <!-- ATK zone -->
+      <rect x="640" y="200" width="240" height="232" rx="14" fill="rgba(255,107,107,.05)" stroke="#5e2b2b"/>
+      <text x="660" y="224" fill="#ff6b6b" font-family="JetBrains Mono,monospace" font-size="12" font-weight="600">ATK · 10.0.3.0/24</text>
+      <text x="660" y="240" fill="#52606f" font-family="JetBrains Mono,monospace" font-size="10">attacker segment</text>
+
+      <rect x="660" y="256" width="200" height="58" rx="9" fill="#121821" stroke="#1e2733"/>
+      <text x="674" y="280" fill="#e6edf3" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="600">Kali — Attacker</text>
+      <text x="674" y="298" fill="#ff6b6b" font-family="JetBrains Mono,monospace" font-size="11">10.0.3.10 · offensive</text>
+
+      <!-- attack flow: Kali -> LAN -->
+      <path d="M660,300 C 470,440 360,440 200,392" fill="none" stroke="#ff6b6b" stroke-width="1.6" stroke-dasharray="5 5" marker-end="url(#arr)" opacity="0"/>
+      <path d="M660,355 C 470,452 350,452 200,392" fill="none" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="5 4" opacity=".55"/>
+      <text x="430" y="455" text-anchor="middle" fill="#ff6b6b" font-family="JetBrains Mono,monospace" font-size="10.5">attack traffic →</text>
+
+      <!-- log flow: LAN -> SOC, ATK -> SOC handled via pfSense; show convergence -->
+      <path d="M260,285 C 300,285 320,285 360,285" fill="none" stroke="#5ce6a1" stroke-width="1.6" marker-end="url(#arr)" opacity=".8"/>
+    </svg>
+  </div>
+
+  <div class="legend">
+    <span><i class="sw" style="background:#6fb3ff"></i> LAN — corporate</span>
+    <span><i class="sw" style="background:#5ce6a1"></i> SOC — monitoring</span>
+    <span><i class="sw" style="background:#ff6b6b"></i> ATK — attacker</span>
+    <span><i class="sw" style="background:#ffb454"></i> pfSense / IDS</span>
+    <span style="color:#5ce6a1">→ logs to SIEM</span>
+    <span style="color:#ff6b6b">⇢ attack path</span>
+  </div>
+</section>
+
+<section class="block mb">
+  <h2 class="sec">The five machines</h2>
+  <p class="sec-note">Each VM has a fixed role and a fixed address. Status reflects the live build.</p>
+  <table>
+    <thead>
+      <tr><th>Host</th><th>Role</th><th>Subnet · IP</th><th>OS</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="vm">pfSense</span></td>
+        <td>Firewall, router, Suricata IDS</td>
+        <td><span class="ip">gateways .1 on each</span></td>
+        <td>FreeBSD</td>
+        <td><span class="st st-on">online</span></td>
+      </tr>
+      <tr>
+        <td><span class="vm">DC01</span></td>
+        <td>Domain controller — AD, DNS, DHCP</td>
+        <td>LAN · <span class="ip">10.0.1.10</span></td>
+        <td>Win Server 2022</td>
+        <td><span class="st st-on">online</span></td>
+      </tr>
+      <tr>
+        <td><span class="vm">WKSTN01</span></td>
+        <td>Domain-joined endpoint (victim)</td>
+        <td>LAN · <span class="ip">DHCP</span></td>
+        <td>Windows 11</td>
+        <td><span class="st st-dev">in dev</span></td>
+      </tr>
+      <tr>
+        <td><span class="vm">Splunk</span></td>
+        <td>SIEM — log index, correlation, dashboards</td>
+        <td>SOC · <span class="ip">10.0.2.10</span></td>
+        <td>Ubuntu</td>
+        <td><span class="st st-dev">in dev</span></td>
+      </tr>
+      <tr>
+        <td><span class="vm">Kali</span></td>
+        <td>Attacker — offensive tooling</td>
+        <td>ATK · <span class="ip">10.0.3.10</span></td>
+        <td>Kali Linux</td>
+        <td><span class="st st-dev">in dev</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="block mb">
+  <h2 class="sec">The log pipeline</h2>
+  <p class="sec-note">Four sources feed the SIEM. Splunk normalizes them and runs detections on top.</p>
+  <div class="pipe">
+    <div class="pcard">
+      <div class="h" style="color:#6fb3ff">Windows Security</div>
+      <p>Logon events, account changes, and Kerberos service tickets (4624/4625/4769) from DC01 and the endpoint.</p>
+    </div>
+    <div class="pcard">
+      <div class="h" style="color:var(--signal)">Sysmon</div>
+      <p>Process creation, network connections, and image loads &mdash; the high-fidelity endpoint telemetry behind most detections.</p>
+    </div>
+    <div class="pcard">
+      <div class="h" style="color:var(--alert)">pfSense firewall</div>
+      <p>Allowed and blocked flows across subnets, exported as syslog to spot scanning and lateral movement.</p>
+    </div>
+    <div class="pcard">
+      <div class="h" style="color:var(--crit)">Suricata IDS</div>
+      <p>Signature alerts on the wire &mdash; port scans, exploit attempts, and known-bad traffic patterns.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot">
+    <div class="who">shivenlab.local · built &amp; documented by Shiven Chhugani</div>
+    <div class="fl">
+      <a href="index.html">Overview</a>
+      <a href="https://github.com/ShivenC/shiven-homelab">GitHub ↗</a>
+      <a href="https://linkedin.com/in/shiven-chhugani">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
