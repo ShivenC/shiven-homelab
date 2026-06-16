@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detections — Shiven Homelab</title>
+<meta name="description" content="MITRE ATT&CK–aligned detection content: brute force, Kerberoasting, LSASS dumping, malicious PowerShell, and lateral movement — each with the Splunk search and the attack that triggers it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e14; --panel:#121821; --panel2:#0c121a; --line:#1e2733; --muted:#7d8a9c; --text:#e6edf3;
+    --signal:#5ce6a1; --alert:#ffb454; --crit:#ff6b6b; --blue:#6fb3ff; --maxw:1120px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    background:radial-gradient(900px 500px at 80% -10%,rgba(255,107,107,.05),transparent 60%),var(--bg)}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:'JetBrains Mono',monospace}
+  header.nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(10px);
+    background:rgba(10,14,20,.72);border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:var(--maxw);margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+  .brand{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--signal);
+    border:1px solid var(--line);background:var(--panel);padding:5px 9px;border-radius:6px}
+  .links{display:flex;gap:28px;font-size:14px}
+  .links a{color:var(--muted);transition:color .15s}
+  .links a:hover,.links a[aria-current]{color:var(--text)}
+  .gh{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .gh:hover{color:var(--text)}
+  @media(max-width:720px){.links{display:none}}
+
+  .head{max-width:var(--maxw);margin:0 auto;padding:64px 24px 8px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--alert);margin-bottom:12px}
+  h1{font-size:clamp(30px,5vw,46px);font-weight:700;letter-spacing:-.02em;margin:0 0 16px}
+  .sub{color:var(--muted);max-width:700px;font-size:16px}
+
+  section.block{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .mb{margin-bottom:80px}.mt48{margin-top:48px}
+  h2.sec{font-size:clamp(20px,3vw,26px);font-weight:600;margin:0 0 8px}
+  .sec-note{color:var(--muted);font-size:14px;margin:0 0 24px}
+
+  .banner{display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(255,180,84,.3);
+    background:rgba(255,180,84,.06);border-radius:12px;padding:14px 16px;margin:24px 0 0;font-size:13.5px;color:#e8d9bd}
+  .banner .mono{color:var(--alert)}
+
+  /* matrix */
+  .matrix{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  @media(max-width:880px){.matrix{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:480px){.matrix{grid-template-columns:1fr}}
+  .mcell{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:14px}
+  .mcell .tac{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+  .mcell .tech{font-size:13px;font-weight:500;margin-bottom:4px}
+  .mcell .id{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue)}
+
+  /* detection cards */
+  .det{border:1px solid var(--line);background:var(--panel);border-radius:16px;overflow:hidden;margin-bottom:20px}
+  .det-top{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--line)}
+  .num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .det-name{font-size:17px;font-weight:600;margin:0}
+  .tid{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);background:rgba(111,179,255,.1);padding:3px 8px;border-radius:6px}
+  .sev{font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 8px;border-radius:6px;margin-left:auto}
+  .sev-h{background:rgba(255,107,107,.12);color:var(--crit)}
+  .sev-m{background:rgba(255,180,84,.12);color:var(--alert)}
+  .det-body{padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:760px){.det-body{grid-template-columns:1fr}}
+  .lbl{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .lbl::before{content:"";width:6px;height:6px;border-radius:99px;background:currentColor}
+  .lbl.atk{color:var(--crit)}.lbl.det{color:var(--signal)}
+  pre{margin:0;background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:14px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;color:#cdd9e5}
+  pre .c{color:#5b6b7d}
+  pre .k{color:var(--signal)}
+  pre .s{color:var(--alert)}
+  .why{padding:0 20px 20px;font-size:13.5px;color:var(--muted);line-height:1.6}
+  .why b{color:var(--text);font-weight:600}
+
+  footer{border-top:1px solid var(--line);margin-top:8px}
+  .foot{max-width:var(--maxw);margin:0 auto;padding:40px 24px;display:flex;flex-wrap:wrap;
+    align-items:center;justify-content:space-between;gap:16px}
+  .foot .who{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .foot .fl{display:flex;gap:24px;font-size:14px}
+  .foot .fl a{color:var(--muted)}.foot .fl a:hover{color:var(--text)}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">~/shivenlab</a>
+    <nav class="links">
+      <a href="index.html">Overview</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="detections.html" aria-current="page">Detections</a>
+      <a href="updates.html">Build Log</a>
+      <a href="about.html">About</a>
+    </nav>
+    <a href="https://github.com/ShivenC/shiven-homelab" class="gh">GitHub ↗</a>
+  </div>
+</header>
+
+<div class="head">
+  <div class="eyebrow">// detection engineering</div>
+  <h1>Each detection has an attack that proves it works.</h1>
+  <p class="sub">Detection content is only real if you can trigger it on demand. For every technique below I pair the Splunk search that catches it with the exact Kali command that sets it off &mdash; the same attack-then-detect loop a SOC uses to validate coverage.</p>
+  <div class="banner">
+    <span class="mono">note:</span>
+    <span>The searches and triggers below are the planned detection set. They&rsquo;re written and version-controlled now; the &ldquo;in dev&rdquo; tag on each clears once it&rsquo;s validated end-to-end against live telemetry in the running lab.</span>
+  </div>
+</div>
+
+<section class="block mb mt48">
+  <h2 class="sec">ATT&amp;CK coverage</h2>
+  <p class="sec-note">Five techniques across the credential-access and movement tactics.</p>
+  <div class="matrix">
+    <div class="mcell">
+      <div class="tac">Credential Access</div>
+      <div class="tech">Brute Force</div>
+      <div class="id">T1110</div>
+    </div>
+    <div class="mcell">
+      <div class="tac">Credential Access</div>
+      <div class="tech">Kerberoasting</div>
+      <div class="id">T1558.003</div>
+    </div>
+    <div class="mcell">
+      <div class="tac">Credential Access</div>
+      <div class="tech">LSASS Memory</div>
+      <div class="id">T1003.001</div>
+    </div>
+    <div class="mcell">
+      <div class="tac">Execution</div>
+      <div class="tech">PowerShell</div>
+      <div class="id">T1059.001</div>
+    </div>
+    <div class="mcell">
+      <div class="tac">Lateral Movement</div>
+      <div class="tech">SMB / Admin Shares</div>
+      <div class="id">T1021.002</div>
+    </div>
+  </div>
+</section>
+
+<section class="block mb">
+  <h2 class="sec">The detections</h2>
+  <p class="sec-note">SPL on the right, the trigger on the left. Severity reflects impact in the lab&rsquo;s context.</p>
+
+  <!-- 01 brute force -->
+  <div class="det">
+    <div class="det-top">
+      <span class="num">01</span>
+      <h3 class="det-name">Password brute force against the domain</h3>
+      <span class="tid">T1110</span>
+      <span class="sev sev-m">medium</span>
+    </div>
+    <div class="det-body">
+      <div>
+        <div class="lbl atk">trigger · kali</div>
+<pre><span class="c"># spray a wordlist at SMB</span>
+<span class="k">crackmapexec</span> smb 10.0.1.10 \
+  -u jsmith \
+  -p <span class="s">rockyou.txt</span></pre>
+      </div>
+      <div>
+        <div class="lbl det">splunk search</div>
+<pre><span class="k">index</span>=wineventlog EventCode=<span class="s">4625</span>
+| bucket _time span=5m
+| <span class="k">stats</span> count by _time, Account_Name, src
+| <span class="k">where</span> count &gt; 10</pre>
+      </div>
+    </div>
+    <div class="why">Counts failed logons (<b>4625</b>) per account in 5-minute windows. More than ten failures from one source is the classic spray signature &mdash; a real user fat-fingering a password doesn&rsquo;t fail ten times in five minutes.</div>
+  </div>
+
+  <!-- 02 kerberoasting -->
+  <div class="det">
+    <div class="det-top">
+      <span class="num">02</span>
+      <h3 class="det-name">Kerberoasting — service ticket harvesting</h3>
+      <span class="tid">T1558.003</span>
+      <span class="sev sev-h">high</span>
+    </div>
+    <div class="det-body">
+      <div>
+        <div class="lbl atk">trigger · kali</div>
+<pre><span class="c"># request all SPN tickets</span>
+<span class="k">impacket-GetUserSPNs</span> \
+  shivenlab.local/jsmith \
+  -dc-ip 10.0.1.10 <span class="s">-request</span></pre>
+      </div>
+      <div>
+        <div class="lbl det">splunk search</div>
+<pre><span class="k">index</span>=wineventlog EventCode=<span class="s">4769</span>
+  Ticket_Encryption_Type=<span class="s">0x17</span>
+| <span class="k">stats</span> count by Account_Name, Service_Name
+| <span class="k">where</span> count &gt; 3</pre>
+      </div>
+    </div>
+    <div class="why">Service-ticket requests (<b>4769</b>) using weak <b>RC4</b> encryption (0x17) are the tell. A planted SPN on <span class="mono">jsmith</span> acts as bait &mdash; one account suddenly pulling many service tickets is someone collecting hashes to crack offline.</div>
+  </div>
+
+  <!-- 03 lsass -->
+  <div class="det">
+    <div class="det-top">
+      <span class="num">03</span>
+      <h3 class="det-name">LSASS memory access — credential dumping</h3>
+      <span class="tid">T1003.001</span>
+      <span class="sev sev-h">high</span>
+    </div>
+    <div class="det-body">
+      <div>
+        <div class="lbl atk">trigger · endpoint</div>
+<pre><span class="c"># dump lsass with mimikatz</span>
+<span class="k">mimikatz</span> # sekurlsa::logonpasswords</pre>
+      </div>
+      <div>
+        <div class="lbl det">splunk search</div>
+<pre><span class="k">index</span>=sysmon EventCode=<span class="s">10</span>
+  TargetImage=<span class="s">"*lsass.exe"</span>
+  GrantedAccess=<span class="s">0x1010</span>
+| <span class="k">stats</span> count by SourceImage, Computer</pre>
+      </div>
+    </div>
+    <div class="why">Sysmon <b>Event 10</b> logs process access. Anything opening <b>lsass.exe</b> with <b>0x1010</b> rights is reading credential memory &mdash; legitimate software almost never does this, so it&rsquo;s a high-signal alert.</div>
+  </div>
+
+  <!-- 04 powershell -->
+  <div class="det">
+    <div class="det-top">
+      <span class="num">04</span>
+      <h3 class="det-name">Suspicious encoded PowerShell</h3>
+      <span class="tid">T1059.001</span>
+      <span class="sev sev-m">medium</span>
+    </div>
+    <div class="det-body">
+      <div>
+        <div class="lbl atk">trigger · endpoint</div>
+<pre><span class="c"># obfuscated download cradle</span>
+powershell <span class="s">-enc</span> \
+  SQBFAFgAKABJA...<span class="c"># base64</span></pre>
+      </div>
+      <div>
+        <div class="lbl det">splunk search</div>
+<pre><span class="k">index</span>=sysmon EventCode=<span class="s">1</span>
+  Image=<span class="s">"*powershell.exe"</span>
+| <span class="k">regex</span> CommandLine=<span class="s">"(?i)-enc|-nop|iex|downloadstring"</span>
+| <span class="k">table</span> _time, Computer, CommandLine</pre>
+      </div>
+    </div>
+    <div class="why">Sysmon <b>Event 1</b> captures process creation with full command lines. Encoded (<b>-enc</b>), no-profile (<b>-nop</b>), and in-memory execution (<b>IEX</b>) flags are hallmarks of download cradles and fileless payloads.</div>
+  </div>
+
+  <!-- 05 lateral -->
+  <div class="det">
+    <div class="det-top">
+      <span class="num">05</span>
+      <h3 class="det-name">Lateral movement over admin shares</h3>
+      <span class="tid">T1021.002</span>
+      <span class="sev sev-h">high</span>
+    </div>
+    <div class="det-body">
+      <div>
+        <div class="lbl atk">trigger · kali</div>
+<pre><span class="c"># exec across hosts with creds</span>
+<span class="k">impacket-psexec</span> \
+  shivenlab.local/itadmin@10.0.1.20</pre>
+      </div>
+      <div>
+        <div class="lbl det">splunk search</div>
+<pre><span class="k">index</span>=wineventlog EventCode=<span class="s">4624</span>
+  Logon_Type=<span class="s">3</span>
+| <span class="k">stats</span> dc(Computer) as hosts by Account_Name
+| <span class="k">where</span> hosts &gt; 2</pre>
+      </div>
+    </div>
+    <div class="why">Network logons (<b>4624</b>, type <b>3</b>) fanning out from one account to several machines in a short window is the footprint of an attacker reusing stolen credentials to hop across the domain.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot">
+    <div class="who">shivenlab.local · built &amp; documented by Shiven Chhugani</div>
+    <div class="fl">
+      <a href="index.html">Overview</a>
+      <a href="https://github.com/ShivenC/shiven-homelab">GitHub ↗</a>
+      <a href="https://linkedin.com/in/shiven-chhugani">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
