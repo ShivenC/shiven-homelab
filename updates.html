@@ -2,34 +2,222 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Updates</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Log — Shiven Homelab</title>
+<meta name="description" content="Phase-by-phase build log of the SIEM & SOC home lab, from network segmentation through detection engineering.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e14; --panel:#121821; --panel2:#0c121a; --line:#1e2733; --muted:#7d8a9c; --text:#e6edf3;
+    --signal:#5ce6a1; --alert:#ffb454; --crit:#ff6b6b; --blue:#6fb3ff; --maxw:1120px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    background:radial-gradient(900px 500px at 80% -10%,rgba(92,230,161,.06),transparent 60%),var(--bg)}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:'JetBrains Mono',monospace}
+  header.nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(10px);
+    background:rgba(10,14,20,.72);border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:var(--maxw);margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+  .brand{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--signal);
+    border:1px solid var(--line);background:var(--panel);padding:5px 9px;border-radius:6px}
+  .links{display:flex;gap:28px;font-size:14px}
+  .links a{color:var(--muted);transition:color .15s}
+  .links a:hover,.links a[aria-current]{color:var(--text)}
+  .gh{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .gh:hover{color:var(--text)}
+  @media(max-width:720px){.links{display:none}}
+
+  .head{max-width:var(--maxw);margin:0 auto;padding:64px 24px 8px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--alert);margin-bottom:12px}
+  h1{font-size:clamp(30px,5vw,46px);font-weight:700;letter-spacing:-.02em;margin:0 0 16px}
+  .sub{color:var(--muted);max-width:680px;font-size:16px}
+
+  .tl{max-width:var(--maxw);margin:48px auto 0;padding:0 24px 40px}
+  .phase{position:relative;padding:0 0 8px 34px;border-left:1px solid var(--line);margin-left:6px}
+  .phase:last-child{border-left-color:transparent}
+  .node{position:absolute;left:-7px;top:3px;width:13px;height:13px;border-radius:99px;border:2px solid var(--bg)}
+  .n-done{background:var(--signal)}
+  .n-dev{background:var(--alert)}
+  .n-plan{background:#3a4654}
+  .ph-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-bottom:6px}
+  .ph-id{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .ph-title{font-size:18px;font-weight:600;margin:0}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 8px;border-radius:6px}
+  .t-done{background:rgba(92,230,161,.12);color:var(--signal)}
+  .t-dev{background:rgba(255,180,84,.12);color:var(--alert)}
+  .t-plan{background:rgba(125,138,156,.14);color:var(--muted)}
+  .ph-body{padding:6px 0 30px}
+  .ph-body p{margin:0 0 12px;color:var(--muted);font-size:14.5px;line-height:1.65}
+  .ph-body p b{color:var(--text);font-weight:600}
+  .ph-body ul{margin:0;padding-left:18px;color:var(--muted);font-size:14px;line-height:1.7}
+  .ph-body li{margin-bottom:4px}
+  .ph-body code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--panel2);
+    border:1px solid var(--line);padding:1px 6px;border-radius:5px;color:#cdd9e5}
+  .callout{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:14px 16px;margin:4px 0 14px}
+  .callout .ct{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--alert);margin-bottom:6px}
+  .callout p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.6}
+
+  footer{border-top:1px solid var(--line);margin-top:8px}
+  .foot{max-width:var(--maxw);margin:0 auto;padding:40px 24px;display:flex;flex-wrap:wrap;
+    align-items:center;justify-content:space-between;gap:16px}
+  .foot .who{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .foot .fl{display:flex;gap:24px;font-size:14px}
+  .foot .fl a{color:var(--muted)}.foot .fl a:hover{color:var(--text)}
+</style>
 </head>
+<body>
 
-<body class="text-white bg-[#020617]">
-
-<header class="flex justify-between items-center px-10 py-6 backdrop-blur-md bg-white/5 border-b border-white/10">
-<a href="index.html" class="text-xl font-semibold hover:text-blue-400">Shiven Lab</a>
-<nav class="space-x-6 text-sm">
-<a href="index.html">Home</a>
-<a href="about.html">About</a>
-<a href="specs.html">Specs</a>
-</nav>
+<header class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">~/shivenlab</a>
+    <nav class="links">
+      <a href="index.html">Overview</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="detections.html">Detections</a>
+      <a href="updates.html" aria-current="page">Build Log</a>
+      <a href="about.html">About</a>
+    </nav>
+    <a href="https://github.com/ShivenC/shiven-homelab" class="gh">GitHub ↗</a>
+  </div>
 </header>
 
-<section class="max-w-3xl mx-auto mt-20 px-6">
+<div class="head">
+  <div class="eyebrow">// build log</div>
+  <h1>How the lab came together, phase by phase.</h1>
+  <p class="sub">A running record of what I built, what broke, and how I fixed it. The messy parts &mdash; like migrating the whole lab between hypervisors mid-build &mdash; are the parts that taught me the most.</p>
+</div>
 
-<h1 class="text-4xl font-bold mb-8">Weekly Updates</h1>
+<div class="tl">
 
-<div class="space-y-4">
+  <!-- phase 01 -->
+  <div class="phase">
+    <span class="node n-done"></span>
+    <div class="ph-head">
+      <span class="ph-id">phase 01</span>
+      <h2 class="ph-title">Network segmentation</h2>
+      <span class="tag t-done">done</span>
+    </div>
+    <div class="ph-body">
+      <p>Stood up <b>pfSense</b> as the core of the lab and carved the network into three isolated subnets, each on its own interface:</p>
+      <ul>
+        <li><b>LAN</b> <code>10.0.1.0/24</code> — corporate segment for AD and endpoints</li>
+        <li><b>SOC</b> <code>10.0.2.0/24</code> — monitoring segment for Splunk and Nessus</li>
+        <li><b>ATK</b> <code>10.0.3.0/24</code> — quarantined attacker segment for Kali</li>
+      </ul>
+      <p>DHCP disabled on the internal nets so addressing stays deterministic. The only path to the internet is pfSense&rsquo;s NAT uplink &mdash; the attacker subnet can never reach the host network.</p>
+    </div>
+  </div>
 
-<a href="posts/week1-setup.html" class="block p-5 bg-white/5 rounded-xl hover:bg-white/10 transition">
-Week 1 – Lab Setup
-</a>
+  <!-- phase 02 -->
+  <div class="phase">
+    <span class="node n-done"></span>
+    <div class="ph-head">
+      <span class="ph-id">phase 02</span>
+      <h2 class="ph-title">Active Directory domain</h2>
+      <span class="tag t-done">done</span>
+    </div>
+    <div class="ph-body">
+      <p>Built <b>DC01</b> on Windows Server 2022 and promoted it to a domain controller for <code>shivenlab.local</code> &mdash; running AD DS, DNS, and DHCP. Then populated it like a small org:</p>
+      <ul>
+        <li>Organizational units for IT and Marketing</li>
+        <li>Domain users (<code>jsmith</code>, <code>slee</code>, <code>itadmin</code>) with <code>itadmin</code> in Domain Admins</li>
+        <li>A planted SPN on <code>jsmith</code> to act as Kerberoasting bait</li>
+      </ul>
+      <p>This gives the attacks something realistic to chew on &mdash; real accounts, real group nesting, real misconfigurations to find.</p>
+    </div>
+  </div>
+
+  <!-- phase 03 migration -->
+  <div class="phase">
+    <span class="node n-done"></span>
+    <div class="ph-head">
+      <span class="ph-id">phase 03</span>
+      <h2 class="ph-title">Hypervisor migration — VirtualBox → VMware</h2>
+      <span class="tag t-done">done</span>
+    </div>
+    <div class="ph-body">
+      <p>The host&rsquo;s Hyper-V components conflicted with VirtualBox and blocked the Windows 11 endpoint from booting. Rather than fight it, I moved the entire lab to <b>VMware Workstation</b> &mdash; without rebuilding anything.</p>
+      <div class="callout">
+        <div class="ct">// the fix that worked</div>
+        <p>OVF export choked on a disk-capacity mismatch, and a direct attach tried to mount the disk as raw physical storage. The clean path was converting each disk explicitly: <code>VBoxManage clonemedium</code> for the DC and <code>vmware-vdiskmanager -r</code> for pfSense, then attaching the converted VMDKs to fresh VM shells.</p>
+      </div>
+      <p>Result: pfSense came back with all four interfaces intact, and DC01 booted with the full domain preserved &mdash; <code>Get-ADDomain</code> confirmed every user, OU, and role survived. Only fix needed was re-setting the static IP after the virtual NIC changed.</p>
+    </div>
+  </div>
+
+  <!-- phase 04 endpoint -->
+  <div class="phase">
+    <span class="node n-dev"></span>
+    <div class="ph-head">
+      <span class="ph-id">phase 04</span>
+      <h2 class="ph-title">Windows endpoint + telemetry</h2>
+      <span class="tag t-dev">in dev</span>
+    </div>
+    <div class="ph-body">
+      <p>Building <b>WKSTN01</b> (Windows 11), joining it to <code>shivenlab.local</code>, and instrumenting it for visibility:</p>
+      <ul>
+        <li><b>Sysmon</b> with a tuned config for process, network, and image-load events</li>
+        <li><b>Splunk Universal Forwarder</b> shipping Security and Sysmon logs to the SIEM</li>
+        <li>Script-block logging enabled to capture PowerShell activity</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- phase 05 splunk -->
+  <div class="phase">
+    <span class="node n-dev"></span>
+    <div class="ph-head">
+      <span class="ph-id">phase 05</span>
+      <h2 class="ph-title">Splunk SIEM &amp; detections</h2>
+      <span class="tag t-dev">in dev</span>
+    </div>
+    <div class="ph-body">
+      <p>Standing up <b>Splunk</b> in the SOC subnet, onboarding all four log sources, and turning the <a href="detections.html" style="color:var(--signal)">planned detection set</a> into live correlation searches with notable events and dashboards.</p>
+    </div>
+  </div>
+
+  <!-- phase 06 attacks -->
+  <div class="phase">
+    <span class="node n-plan"></span>
+    <div class="ph-head">
+      <span class="ph-id">phase 06</span>
+      <h2 class="ph-title">Attack validation + Suricata</h2>
+      <span class="tag t-plan">planned</span>
+    </div>
+    <div class="ph-body">
+      <p>Run each attack from Kali end-to-end, confirm the matching detection fires, and tune out false positives. Add the <b>Suricata</b> IDS feed from pfSense for network-layer coverage.</p>
+    </div>
+  </div>
+
+  <!-- phase 07 nessus -->
+  <div class="phase">
+    <span class="node n-plan"></span>
+    <div class="ph-head">
+      <span class="ph-id">phase 07</span>
+      <h2 class="ph-title">Vulnerability management</h2>
+      <span class="tag t-plan">planned</span>
+    </div>
+    <div class="ph-body">
+      <p>Run authenticated <b>Nessus</b> scans across the lab, then prioritize remediation by CVSS and map findings to <b>NIST 800-53</b> controls &mdash; closing the loop from detection to hardening.</p>
+    </div>
+  </div>
 
 </div>
 
-</section>
+<footer>
+  <div class="foot">
+    <div class="who">shivenlab.local · built &amp; documented by Shiven Chhugani</div>
+    <div class="fl">
+      <a href="index.html">Overview</a>
+      <a href="https://github.com/ShivenC/shiven-homelab">GitHub ↗</a>
+      <a href="https://linkedin.com/in/shiven-chhugani">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
 
 </body>
 </html>
